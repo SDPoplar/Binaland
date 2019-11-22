@@ -13,12 +13,28 @@ namespace SeaDrip
             public:
                 ConfigPropertyTpl( std::string config );
                 bool IsValid() const noexcept;
+                bool CanBeSetByShell() const noexcept;
+                bool CanBeSetByConfigFile() const noexcept;
+                bool IsBoolProperty() const noexcept;
+                std::string GetDeclears( int tabs ) const noexcept;
+                std::string GetPropertyDeclear( int tabs ) const noexcept;
+                std::string GetMethodDeclear( int tabs ) const noexcept;
+
+            protected:
+                std::string m_s_shell_flag;
+                std::string m_s_config_file_item;
+                std::string m_s_property_type;
+                std::string m_s_property_name;
+                std::string m_s_method_name;
+                std::string m_s_default_value;
+
+                bool m_b_well_loaded;
         };
 
         class ConfigItem
         {
             public:
-                ConfigItem( std::string tpl, std::string codepath );
+                ConfigItem( std::string tpl, std::string codepath, std::string useNamespace );
                 ~ConfigItem() {}
 
                 std::string GetTplPath() const noexcept;
@@ -31,13 +47,23 @@ namespace SeaDrip
                 std::string m_s_config_name;
             private:
                 bool m_b_tpl_parsed;
+                std::string m_s_namespace;
                 std::string m_s_tpl;
                 std::string m_s_target_path;
                 std::string m_s_out_header_path;
                 std::string m_s_out_cpp_path;
+                std::vector<std::string> m_arr_includes;
         };
     };
 };
+
+#define CLOSE_OPENED_FILE( var ) do             \
+{                                               \
+    if( var.is_open() )                         \
+    {                                           \
+        var.close();                            \
+    }                                           \
+} while( false )
 
 #endif
 

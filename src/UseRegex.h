@@ -4,11 +4,24 @@
 #include <string>
 #include <vector>
 
+#if defined( _WIN32 ) or defined( _WIN64 )
+#include <regex>
+#define REGEX_NS std
+#define TrimStr( s ) s
+#else
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#define TrimStr( s ) boost::trim_copy( s )
+#define REGEX_NS boost
+#endif
+
 namespace SeaDrip
 {
     std::string regex( std::string pattern, std::string search );
     std::string regex( std::string pattern, std::string search, int retIndex );
     std::vector<std::string> regex_all( std::string pattern, std::string search );
+
+    std::string TabSpace( int num );
 };
 
 #endif

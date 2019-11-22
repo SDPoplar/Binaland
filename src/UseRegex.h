@@ -10,7 +10,7 @@
 #define TrimStr( s ) s
 #else
 #include <boost/regex.hpp>
-#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string.hpp>
 #define TrimStr( s ) boost::trim_copy( s )
 #define REGEX_NS boost
 #endif
@@ -22,6 +22,7 @@ namespace SeaDrip
     std::vector<std::string> regex_all( std::string pattern, std::string search );
 
     std::string TabSpace( int num );
+    std::vector<std::string> SplitStr( std::string splitBy, std::string str );
 };
 
 #endif

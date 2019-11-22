@@ -13,12 +13,18 @@ namespace SeaDrip
             public:
                 ConfigPropertyTpl( std::string config );
                 bool IsValid() const noexcept;
+                std::string GetPropertyType( void ) const noexcept;
                 bool CanBeSetByShell() const noexcept;
                 bool CanBeSetByConfigFile() const noexcept;
                 bool IsBoolProperty() const noexcept;
+                bool HasDefVal() const noexcept;
+                std::string GetDefValInit() const noexcept;
                 std::string GetDeclears( int tabs ) const noexcept;
                 std::string GetPropertyDeclear( int tabs ) const noexcept;
                 std::string GetMethodDeclear( int tabs ) const noexcept;
+                std::string GetMethodCode( std::string configName ) const noexcept;
+                std::string GetShellOption() const noexcept;
+                std::string GetShellOverrideCase() const noexcept;
 
             protected:
                 std::string m_s_shell_flag;
@@ -53,6 +59,7 @@ namespace SeaDrip
                 std::string m_s_out_header_path;
                 std::string m_s_out_cpp_path;
                 std::vector<std::string> m_arr_includes;
+                std::vector<std::string> m_arr_unknown_classes;
         };
     };
 };

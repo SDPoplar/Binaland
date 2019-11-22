@@ -1,14 +1,19 @@
 binaland: build/config/config_item.o build/config/config_property_tpl.o build/entry.o build/use_regex.o
-	g++ -std=c++11 build/entry.o build/use_regex.o build/config/config_item.o build/config/config_property_tpl.o -o binaland -lboost_regex
+	g++ -g -std=c++11 build/entry.o build/use_regex.o build/config/config_item.o build/config/config_property_tpl.o -o binaland -lboost_regex
 
 build/use_regex.o: src/UseRegex.cpp src/UseRegex.h
-	g++ -std=c++11 -c src/UseRegex.cpp -o build/use_regex.o -lboost_regex
+	g++ -g -std=c++11 -c src/UseRegex.cpp -o build/use_regex.o -lboost_regex
 
 build/config/config_item.o: src/config/ConfigItem.cpp src/config/ConfigItem.h
-	g++ -std=c++11 -c src/config/ConfigItem.cpp -o build/config/config_item.o -lboost_regex
+	g++ -g -std=c++11 -c src/config/ConfigItem.cpp -o build/config/config_item.o -lboost_regex
 
 build/config/config_property_tpl.o: src/config/ConfigPropertyTpl.cpp src/config/ConfigItem.h
-	g++ -std=c++11 -c src/config/ConfigPropertyTpl.cpp -o build/config/config_property_tpl.o
+	g++ -g -std=c++11 -c src/config/ConfigPropertyTpl.cpp -o build/config/config_property_tpl.o
 
 build/entry.o: src/main.cpp
-	g++ -std=c++11 -c src/main.cpp -o build/entry.o
+	g++ -g -std=c++11 -c src/main.cpp -o build/entry.o
+
+clear:
+	rm -f build/config/*.o
+	rm -f build/*.o
+	rm -f binaland

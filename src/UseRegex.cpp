@@ -18,7 +18,7 @@ std::vector<std::string> SeaDrip::regex_all( std::string pattern, std::string se
     std::vector<std::string> ret;
     REGEX_NS::regex _pattern( pattern );
     REGEX_NS::smatch matches;
-    if( REGEX_NS::regex_search( search, matches, _pattern ) )
+    if( REGEX_NS::regex_search( search, matches, _pattern, REGEX_NS::match_extra ) )
     {
         for( std::string item : matches )
         {
@@ -34,6 +34,17 @@ std::string SeaDrip::TabSpace( int num )
     for( int i=0; i<num; i++ )
     {
         ret += "    ";
+    }
+    return ret;
+}
+
+std::vector<std::string> SeaDrip::SplitStr( std::string splitBy, std::string str )
+{
+    std::vector<std::string> ret;
+    boost::split( ret, str, boost::is_any_of( splitBy ), boost::token_compress_on );
+    for( auto& item : ret )
+    {
+        item = boost::trim_copy( item );
     }
     return ret;
 }

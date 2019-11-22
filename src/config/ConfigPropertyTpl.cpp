@@ -6,7 +6,6 @@ using namespace SeaDrip::Binaland;
 ConfigPropertyTpl::ConfigPropertyTpl( std::string tpl ) : m_b_well_loaded( false )
 {
     //  +f, , class std::string, m_s_input_file, InputFileName, defaultValue
-    std::cout << "???" << tpl << std::endl;
     auto ret = SeaDrip::regex_all( "\\+([^,]*)\\,([^\\,]*)\\,([^\\,]+)\\,([^\\,]+)\\,([^\\,]+)\\,([^\\,]*)", tpl );
     if( ret.size() < 6 )
     {
@@ -19,7 +18,19 @@ ConfigPropertyTpl::ConfigPropertyTpl( std::string tpl ) : m_b_well_loaded( false
     this->m_s_method_name = ret[ 5 ];
     this->m_s_default_value = ret[ 6 ];
     this->m_b_well_loaded = true;
-    std::cout << this->m_s_method_name << std::endl;
+    if( this->HasDefVal() )
+    {
+        return;
+    }
+    if( boost::iends_with( this->m_s_property_type, "string" ) )
+    {
+        this->m_s_default_value = "\"\"";
+        return;
+    }
+    if( boost::ends_with( this->m_s_property_type, "*" ) )
+    {
+        this->m_s_default_value = "nullptr";
+    }
 }
 
 bool ConfigPropertyTpl::IsValid( void ) const noexcept
@@ -36,6 +47,11 @@ bool ConfigPropertyTpl::IsBoolProperty( void ) const noexcept
     return this->m_s_property_type == "bool";
 }
 
+std::string ConfigPropertyTpl::GetPropertyType( void ) const noexcept
+{
+    return this->m_s_property_type;
+}
+
 bool ConfigPropertyTpl::CanBeSetByConfigFile( void ) const noexcept
 {
     return !this->m_s_config_file_item.empty();
@@ -46,9 +62,14 @@ bool ConfigPropertyTpl::CanBeSetByShell( void ) const noexcept
     return !this->m_s_shell_flag.empty();
 }
 
+bool ConfigPropertyTpl::HasDefVal( void ) const noexcept
+{
+    return !this->m_s_default_value.empty();
+}
+
 std::string ConfigPropertyTpl::GetDeclears( int tabs ) const noexcept
 {
-    return TabSpace( tabs ) + "// Declear " + this->m_s_property_name + "\n" + TabSpace( tabs )
+    return "\n" + TabSpace( tabs ) + "// Declear " + this->m_s_property_name + "\n" + TabSpace( tabs )
         +"public:\n" + this->GetMethodDeclear( tabs + 1 ) + "\n" + TabSpace( tabs ) + "protected:\n" + this->GetPropertyDeclear( tabs + 1 );
 }
 
@@ -64,4 +85,28 @@ std::string ConfigPropertyTpl::GetPropertyDeclear( int tabs ) const noexcept
 {
     std::string ret = TabSpace( tabs ) + "TConfigProperty<" + this->m_s_property_type + "> " + this->m_s_property_name + ";";
     return ret;
+}
+
+std::string ConfigPropertyTpl::GetDefValInit( void ) const noexcept
+{
+    return this->m_s_property_name + "( " + this->m_s_default_value + " )";
+}
+
+std::string ConfigPropertyTpl::GetMethodCode( std::string configName ) const noexcept
+{
+    return "void " + configName + "::Set" + this->m_s_method_name + "( " + this->m_s_property_type + " val )\n{\n" + TabSpace( 1 ) + "this->"
+        + this->m_s_property_name + ".Set( EConfigSetFrom::RUNTIME, val );\n}\n\n" + this->m_s_property_type + " " + configName
+        + ( this->IsBoolProperty() ? "::Is" : "::Get" ) + this->m_s_method_name + "( void ) const noexcept\n{\n"
+        + TabSpace( 1 ) + "return this->" + this->m_s_property_name + ".Get();\n}\n";
+}
+
+std::string ConfigPropertyTpl::GetShellOption( void ) const noexcept
+{
+    return this->m_s_shell_flag + ( this->IsBoolProperty() ? "" : ":" );
+}
+
+std::string ConfigPropertyTpl::GetShellOverrideCase() const noexcept
+{
+    return "case '" + this->m_s_shell_flag + "': this->" + this->m_s_property_name + ".Set( EConfigSetFrom::SHELL, "
+        + ( this->IsBoolProperty() ? "true" : "optarg" ) + " ); break;\n";
 }

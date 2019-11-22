@@ -1,43 +1,52 @@
-#ifndef __SD_Binaland_BinalandConfig_H__
-#define __SD_Binaland_BinalandConfig_H__
+#ifndef __SD_BINALAND_BINALANDCONFIG_H__
+#define __SD_BINALAND_BINALANDCONFIG_H__
+#include <string>
+#include <vector>
 #include <seadrip/ConfigProperty.hpp>
 namespace SeaDrip
 {
     namespace Binaland
+    {
+        class BinalandConfig
         {
-            class BinalandConfig : public SeaDrip::SeaDripConfig
-            {
-            // Declear m_s_class_name
-            public:
-                class std::string GetConfigClassName( void ) const noexcept;
-                void SetConfigClassName( class std::string );
-            protected:
-                TConfigProperty<class std::string> m_s_class_name;
-            // Declear m_s_code_path
-            public:
-                class std::string GetCodePath( void ) const noexcept;
-                void SetCodePath( class std::string );
-            protected:
-                TConfigProperty<class std::string> m_s_code_path;
-            // Declear m_s_tpl_path
-            public:
-                class std::string GetTemplatePath( void ) const noexcept;
-                void SetTemplatePath( class std::string );
-            protected:
-                TConfigProperty<class std::string> m_s_tpl_path;
-            // Declear m_s_cpp_suffix
-            public:
-                class std::string GetCodeSuffix( void ) const noexcept;
-                void SetCodeSuffix( class std::string );
-            protected:
-                TConfigProperty<class std::string> m_s_cpp_suffix;
-            // Declear m_s_input_file
-            public:
-                class std::string GetInputFileName( void ) const noexcept;
-                void SetInputFileName( class std::string );
-            protected:
-                TConfigProperty<class std::string> m_s_input_file;
-}
-        }
-    }
+        public:
+            BinalandConfig( int, char** );
+
+        // Declear m_s_class_name
+        public:
+            std::string GetConfigClassName( void ) const noexcept;
+            void SetConfigClassName( std::string );
+        protected:
+            TConfigProperty<std::string> m_s_class_name;
+
+        // Declear m_s_code_path
+        public:
+            std::string GetCodePath( void ) const noexcept;
+            void SetCodePath( std::string );
+        protected:
+            TConfigProperty<std::string> m_s_code_path;
+
+        // Declear m_s_tpl_path
+        public:
+            std::string GetTemplatePath( void ) const noexcept;
+            void SetTemplatePath( std::string );
+        protected:
+            TConfigProperty<std::string> m_s_tpl_path;
+
+        // Declear m_s_cpp_suffix
+        public:
+            std::string GetCodeSuffix( void ) const noexcept;
+            void SetCodeSuffix( std::string );
+        protected:
+            TConfigProperty<std::string> m_s_cpp_suffix;
+
+        // Declear m_s_input_file
+        public:
+            std::string GetInputFileName( void ) const noexcept;
+            void SetInputFileName( std::string );
+        protected:
+            TConfigProperty<std::string> m_s_input_file;
+        };
+    };
+};
 #endif

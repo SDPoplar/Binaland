@@ -1,5 +1,5 @@
 # Binaland
-[https://github.com/SDPoplar/Binaland](Github - Binaland)
+[Github - Binaland](https://github.com/SDPoplar/Binaland)
 
 > tt = Tiny tools
 
@@ -13,6 +13,7 @@ then can be used in binaland
 ```
 tplmaker
 ```
+or
 ```
 tplmaker --help
 ```

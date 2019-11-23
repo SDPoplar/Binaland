@@ -36,6 +36,7 @@ ConfigPropertyTpl::ConfigPropertyTpl( std::string tpl ) : m_b_well_loaded( false
 bool ConfigPropertyTpl::IsValid( void ) const noexcept
 {
     return !( !this->m_b_well_loaded
+        || ( this->m_s_shell_flag == "c" )
         || this->m_s_property_type.empty()
         || this->m_s_property_name.empty()
         || this->m_s_method_name.empty()

@@ -47,6 +47,10 @@ int ConfigItem::ParseTpl()
         if( sline.c_str()[ 0 ] == '+' )
         {
             ConfigPropertyTpl prop( sline );
+            if( !prop.IsValid() )
+            {
+                continue;
+            }
             if( boost::starts_with( prop.GetPropertyType(), "class " )
                 && ( std::find( this->m_arr_unknown_classes.begin(), this->m_arr_unknown_classes.end(), prop.GetPropertyType() ) == this->m_arr_unknown_classes.end() ) )
             {

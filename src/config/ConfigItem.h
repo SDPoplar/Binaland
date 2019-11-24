@@ -19,12 +19,13 @@ namespace SeaDrip
                 bool IsBoolProperty() const noexcept;
                 bool HasDefVal() const noexcept;
                 std::string GetDefValInit() const noexcept;
-                std::string GetDeclears( int tabs ) const noexcept;
-                std::string GetPropertyDeclear( int tabs ) const noexcept;
-                std::string GetMethodDeclear( int tabs ) const noexcept;
+                std::string GetDeclears() const noexcept;
+                std::string GetPropertyDeclear() const noexcept;
+                std::string GetMethodDeclear() const noexcept;
                 std::string GetMethodCode( std::string configName ) const noexcept;
                 std::string GetShellOption() const noexcept;
                 std::string GetShellOverrideCase() const noexcept;
+                std::string GetBoolShellSetter() const noexcept;
 
             protected:
                 std::string m_s_shell_flag;

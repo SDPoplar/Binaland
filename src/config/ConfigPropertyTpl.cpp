@@ -68,23 +68,22 @@ bool ConfigPropertyTpl::HasDefVal( void ) const noexcept
     return !this->m_s_default_value.empty();
 }
 
-std::string ConfigPropertyTpl::GetDeclears( int tabs ) const noexcept
+std::string ConfigPropertyTpl::GetDeclears( void ) const noexcept
 {
-    return "\n" + TabSpace( tabs ) + "// Declear " + this->m_s_property_name + "\n" + TabSpace( tabs )
-        +"public:\n" + this->GetMethodDeclear( tabs + 1 ) + "\n" + TabSpace( tabs ) + "protected:\n" + this->GetPropertyDeclear( tabs + 1 );
+    return "\n// Declear " + this->m_s_property_name + "\npublic:\n    " + this->GetMethodDeclear() + "\nprotected:\n    " + this->GetPropertyDeclear();
 }
 
-std::string ConfigPropertyTpl::GetMethodDeclear( int tabs ) const noexcept
+std::string ConfigPropertyTpl::GetMethodDeclear() const noexcept
 {
-    std::string ret = TabSpace( tabs ) + this->m_s_property_type + ( this->IsBoolProperty() ? " Is" : " Get" )
-        + this->m_s_method_name + "( void ) const noexcept;\n" + TabSpace( tabs ) + "void Set"
+    std::string ret = this->m_s_property_type + ( this->IsBoolProperty() ? " Is" : " Get" )
+        + this->m_s_method_name + "( void ) const noexcept;\n    void Set"
         + this->m_s_method_name + "( " + this->m_s_property_type + " );";
     return ret;
 }
 
-std::string ConfigPropertyTpl::GetPropertyDeclear( int tabs ) const noexcept
+std::string ConfigPropertyTpl::GetPropertyDeclear( void ) const noexcept
 {
-    std::string ret = TabSpace( tabs ) + "TConfigProperty<" + this->m_s_property_type + "> " + this->m_s_property_name + ";";
+    std::string ret = "TConfigProperty<" + this->m_s_property_type + "> " + this->m_s_property_name + ";";
     return ret;
 }
 
@@ -95,10 +94,10 @@ std::string ConfigPropertyTpl::GetDefValInit( void ) const noexcept
 
 std::string ConfigPropertyTpl::GetMethodCode( std::string configName ) const noexcept
 {
-    return "void " + configName + "::Set" + this->m_s_method_name + "( " + this->m_s_property_type + " val )\n{\n" + TabSpace( 1 ) + "this->"
+    return "void " + configName + "::Set" + this->m_s_method_name + "( " + this->m_s_property_type + " val )\n{\n    this->"
         + this->m_s_property_name + ".Set( EConfigSetFrom::RUNTIME, val );\n}\n\n" + this->m_s_property_type + " " + configName
-        + ( this->IsBoolProperty() ? "::Is" : "::Get" ) + this->m_s_method_name + "( void ) const noexcept\n{\n"
-        + TabSpace( 1 ) + "return this->" + this->m_s_property_name + ".Get();\n}\n";
+        + ( this->IsBoolProperty() ? "::Is" : "::Get" ) + this->m_s_method_name + "( void ) const noexcept\n{\n    return this->"
+        + this->m_s_property_name + ".Get();\n}\n";
 }
 
 std::string ConfigPropertyTpl::GetShellOption( void ) const noexcept
@@ -110,4 +109,9 @@ std::string ConfigPropertyTpl::GetShellOverrideCase() const noexcept
 {
     return "case '" + this->m_s_shell_flag + "': this->" + this->m_s_property_name + ".Set( EConfigSetFrom::SHELL, "
         + ( this->IsBoolProperty() ? "true" : "optarg" ) + " ); break;\n";
+}
+
+std::string ConfigPropertyTpl::GetBoolShellSetter( void ) const noexcept
+{
+    return "this->m_map_bool_props[ '" + this->m_s_shell_flag + "' ] = &this->" + this->m_s_property_name  + ";";
 }

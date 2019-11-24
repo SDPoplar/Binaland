@@ -2,6 +2,8 @@
 #include <fstream>
 #include "../UseRegex.h"
 #include <boost/algorithm/string/split.hpp>
+#include <seadrip/template.hpp>
+#include <seadrip/tpl/config.h>
 
 using namespace SeaDrip::Binaland;
 
@@ -89,51 +91,49 @@ int ConfigItem::SaveOutput()
         return 2;
     }
 
-    std::string header_once_macro = "__SD_" + boost::to_upper_copy( this->m_s_namespace ) + "_" + boost::to_upper_copy( this->m_s_config_name ) + "_H__";
-    header << "#ifndef " << header_once_macro << "\n#define " << header_once_macro;
-    for( auto item : this->m_arr_includes )
-    {
-        header << "\n#include " << item;
-    }
-    header << "\n#include <seadrip/ConfigProperty.hpp>\nnamespace SeaDrip\n{\n"
-        << TabSpace( 1 ) << "namespace " << this->m_s_namespace << "\n" << TabSpace( 1 ) << "{\n" << TabSpace( 2 ) << "class " << this->m_s_config_name
-        << "\n" << TabSpace( 2 ) << "{\n" << TabSpace( 2 ) << "public:\n" << TabSpace( 3 ) << this->m_s_config_name << "( int, char** );\n";
+    std::string header_content = sdtpl_config_header, declear_indent = SeaDrip::Template::GetFrontSpace( header_content, "__REPFLAG_DELCEAR_METHODS__" );
+    boost::replace_all( header_content, "__REPFLAG_REQUIRE_LOCK__",
+        boost::to_upper_copy( this->m_s_namespace ) + "_" + boost::to_upper_copy( this->m_s_config_name ) );
+    boost::replace_all( header_content, "__REPFLAG_NAME_SPACE__", this->m_s_namespace );
+    boost::replace_all( header_content, "__REPFLAG_CLASS_NAME__", this->m_s_config_name );
 
-    cpp << "#include \"" << this->m_s_config_name << ".h\"\n#include <unistd.h>\n";
-    for( auto item : this->m_arr_unknown_classes )
-    {
-        cpp << "// include header file for " << item << "\n";
-    }
-    cpp << "using namespace SeaDrip::" << this->m_s_namespace << ";\n\n";
+    std::string code_content = sdtpl_config_code;
+    boost::replace_all( code_content, "__REPFLAG_CLASS_NAME__", this->m_s_config_name );
+    boost::replace_all( code_content, "__REPFLAG_NAME_SPACE__", this->m_s_namespace );
 
     std::string defval = "";
     std::string options = "";
     std::string optioncases = "";
+    std::string headerdeclears = "";
+    std::string methodcodes = "";
+    std::string boolmap = "";
     for( auto item : this->m_arr_property_tpls )
     {
-        header << item.GetDeclears( 2 ) << "\n";
-        cpp << item.GetMethodCode( this->m_s_config_name ) << "\n";
+        headerdeclears += ( SeaDrip::Template::FillIndent( item.GetDeclears(), declear_indent ) + "\n" );
+        methodcodes += ( item.GetMethodCode( this->m_s_config_name ) + "\n" );
         if( item.HasDefVal() )
         {
-            if( !defval.empty() )
-            {
-                defval += ", ";
-            }
-            defval += item.GetDefValInit();
+            defval += ( ", " + item.GetDefValInit() );
         }
         if( item.CanBeSetByShell() )
         {
             options += item.GetShellOption();
             optioncases += ( TabSpace( 3 ) + item.GetShellOverrideCase() );
         }
+        if( item.IsBoolProperty() )
+        {
+            boolmap += ( item.GetBoolShellSetter() + "\n" );
+        }
     }
+    boost::replace_first( header_content, "__REPFLAG_DELCEAR_METHODS__", headerdeclears );
+    boost::replace_first( code_content, "__REPFLAG_METHOD_CODE__", methodcodes );
+    boost::replace_first( code_content, "__REPFLAG_DEF_VAL__", defval );
+    boost::replace_first( code_content, "__REPFLAG_SHELL_OPTIONS__", options );
+    boost::replace_first( code_content, "__REPFLAG_BOOL_PROP_MAP__", boolmap );
 
-    header << TabSpace( 2 ) << "};\n" << TabSpace( 1 ) << "};\n};\n#endif";
-    cpp << this->m_s_config_name + "::" + this->m_s_config_name + "( int argc, char** argv )" << ( defval.empty() ? "" : " : " ) << defval << "\n{\n"
-        << TabSpace( 1 ) << "char ch;\n" << TabSpace( 1 ) << "while( ( ch = getopt( argc, argv, \"" << options <<"\" ) ) != -1 )\n" << TabSpace( 1 )
-        << "{\n" << TabSpace( 2 ) << "switch( ch )\n" << TabSpace( 2 ) << "{\n" << optioncases << TabSpace( 2 ) << "}\n" << TabSpace( 1 ) << "}\n}\n";
-
+    header << header_content;
     header.close();
+    cpp << code_content;
     cpp.close();
     return 0;
 }

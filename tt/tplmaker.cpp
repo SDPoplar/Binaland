@@ -3,6 +3,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 void usage()
 {
@@ -17,7 +18,16 @@ void usage()
 
 std::string ReplaceMacro( std::string line )
 {
-    return line;
+    boost::regex block_pattern( "TPL_REPLACE\\(\\s*([^\\s]+)\\s*\\);" );
+    boost::regex space_pattern( "TPL_REPLACE_KEEPSPACE\\(\\s*([^,|^\\s]+),[^\\)]+\\)" );
+    std::string ret = boost::regex_replace( line, block_pattern,
+        [](boost::match_results<std::string::const_iterator> match)->std::string{
+            return ( match.size() <  2 ) ? match[ 0 ] : ( "__REPFLAG_" + boost::to_upper_copy( std::string( match[ 1 ] ) ) + "__" );
+        } );
+    return boost::regex_replace( ret, space_pattern,
+        [](boost::match_results<std::string::const_iterator> match)->std::string{
+            return ( match.size() < 2 ) ? match[ 0 ] : ( "__REPFLAG_" + boost::to_upper_copy( std::string( match[ 1 ] ) ) + "__" );
+        } );
 }
 
 bool GiveupSave( std::string target, int argc, char** argv )

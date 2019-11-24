@@ -7,11 +7,13 @@ namespace SeaDrip
 {
     namespace Binaland
     {
-        class BinalandConfig
+        class BinalandConfig : public SeaDrip::BaseConfig
         {
         public:
-            BinalandConfig( int, char** );
-
+            BinalandConfig();
+        protected:
+            void ShellOverride( char shell_flag, std::string val ) override;
+        
         // Declear m_s_class_name
         public:
             std::string GetConfigClassName( void ) const noexcept;
@@ -46,6 +48,14 @@ namespace SeaDrip
             void SetInputFileName( std::string );
         protected:
             TConfigProperty<std::string> m_s_input_file;
+
+        // Declear m_b_create_new
+        public:
+            bool IsCreateMode( void ) const noexcept;
+            void SetCreateMode( bool );
+        protected:
+            TConfigProperty<bool> m_b_create_new;
+
         };
     };
 };

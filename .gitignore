@@ -31,6 +31,14 @@
 *.out
 *.app
 
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+Debug/
+
 build/
 *.swp
 binaland

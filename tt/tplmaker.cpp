@@ -54,8 +54,8 @@ bool ParseTemplate( std::string tpl_file, std::string& name, std::string& conten
     boost::regex pattern( "TEMPLATE_START\\(\\s*([^\\s]+)\\s*\\);" );
     while( !in.eof() )
     {
-        char line[ 128 ];
-        in.getline( line, 128 );
+        char line[ 256 ];
+        in.getline( line, 256 );
         sline = line;
         if( started )
         {
@@ -125,6 +125,7 @@ int main( int argc, char**argv )
         return 0;
     }
 
+    boost::replace_all( content, "\"", "\\\"" );
     out << "const char* sdtpl_" << tplname << " = \"" << content << "\";\n";
     out.close();
     return 0;

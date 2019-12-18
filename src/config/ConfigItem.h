@@ -55,6 +55,7 @@ namespace SeaDrip
             private:
                 bool m_b_tpl_parsed;
                 std::string m_s_namespace;
+                std::string m_s_base_class;
                 std::string m_s_tpl;
                 std::string m_s_target_path;
                 std::string m_s_out_header_path;

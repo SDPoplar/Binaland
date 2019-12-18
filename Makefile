@@ -17,3 +17,6 @@ clear:
 	rm -f build/config/*.o
 	rm -f build/*.o
 	rm -f binaland
+
+install:
+	cp binaland ~/bin/

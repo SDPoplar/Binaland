@@ -21,7 +21,7 @@ bool MatchItem( std::string str, std::string& itemName, std::string& value )
 }
 
 ConfigItem::ConfigItem( std::string in, std::string codepath, std::string useNamespace ) : m_s_tpl( in ), m_s_target_path( codepath ),
-    m_s_namespace( useNamespace ), m_b_tpl_parsed( false ), m_s_out_cpp_path( "" ), m_s_out_header_path( "" )
+    m_s_namespace( useNamespace ), m_s_base_class( "BaseConfig" ), m_b_tpl_parsed( false ), m_s_out_cpp_path( "" ), m_s_out_header_path( "" )
 {}
 
 int ConfigItem::Build()
@@ -32,6 +32,11 @@ int ConfigItem::Build()
 
 int ConfigItem::ParseTpl()
 {
+    if( access( this->m_s_tpl.c_str(), F_OK ) )
+    {
+        this->m_s_tpl = "/" + this->m_s_tpl;
+        this->m_s_tpl = get_current_dir_name() + this->m_s_tpl;
+    }
     std::fstream in( this->m_s_tpl, std::ios::in );
     if( !in )
     {
@@ -75,6 +80,10 @@ int ConfigItem::ParseTpl()
         {
             this->m_arr_includes = SplitStr( ",", val );
         }
+        if( ( key == "type" ) && ( val == "daemon" ) )
+        {
+            this->m_s_base_class = "DaemonConfig";
+        }
     }
     this->m_s_out_header_path = this->m_s_target_path + "/" + this->m_s_config_name + ".h";
     this->m_s_out_cpp_path = this->m_s_target_path + "/" + this->m_s_config_name + ".cpp";
@@ -96,10 +105,12 @@ int ConfigItem::SaveOutput()
         boost::to_upper_copy( this->m_s_namespace ) + "_" + boost::to_upper_copy( this->m_s_config_name ) );
     boost::replace_all( header_content, "__REPFLAG_NAME_SPACE__", this->m_s_namespace );
     boost::replace_all( header_content, "__REPFLAG_CLASS_NAME__", this->m_s_config_name );
+    boost::replace_all( header_content, "__REPFLAG_CONFIG_BASE_CLASS__", this->m_s_base_class );
 
     std::string code_content = sdtpl_config_code;
     boost::replace_all( code_content, "__REPFLAG_CLASS_NAME__", this->m_s_config_name );
     boost::replace_all( code_content, "__REPFLAG_NAME_SPACE__", this->m_s_namespace );
+    boost::replace_all( code_content, "__REPFLAG_CONFIG_BASE_CLASS__", this->m_s_base_class );
 
     std::string defval = "";
     std::string options = "";

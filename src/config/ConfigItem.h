@@ -52,6 +52,7 @@ namespace SeaDrip
 
                 std::vector<ConfigPropertyTpl> m_arr_property_tpls;
                 std::string m_s_config_name;
+                std::string m_s_def_cfgfile;
             private:
                 bool m_b_tpl_parsed;
                 std::string m_s_namespace;

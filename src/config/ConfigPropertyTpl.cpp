@@ -1,22 +1,24 @@
 #include "ConfigItem.h"
-#include "../UseRegex.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 #include <iostream>
 using namespace SeaDrip::Binaland;
 
 ConfigPropertyTpl::ConfigPropertyTpl( std::string tpl ) : m_b_well_loaded( false )
 {
     //  +f, , class std::string, m_s_input_file, InputFileName, defaultValue
-    auto ret = SeaDrip::regex_all( "\\+([^,]*)\\,([^\\,]*)\\,([^\\,]+)\\,([^\\,]+)\\,([^\\,]+)\\,([^\\,]*)", tpl );
+    std::vector<std::string> ret;
+    boost::split( ret, tpl, boost::is_any_of( "," ), boost::token_compress_on );
     if( ret.size() < 6 )
     {
         return;
     }
-    this->m_s_shell_flag = ret[ 1 ];
-    this->m_s_config_file_item = ret[ 2 ];
-    this->m_s_property_type = ret[ 3 ];
-    this->m_s_property_name = ret[ 4 ];
-    this->m_s_method_name = ret[ 5 ];
-    this->m_s_default_value = ret[ 6 ];
+    this->m_s_shell_flag = ret[ 0 ];
+    this->m_s_config_file_item = ret[ 1 ];
+    this->m_s_property_type = ret[ 2 ];
+    this->m_s_property_name = ret[ 3 ];
+    this->m_s_method_name = ret[ 4 ];
+    this->m_s_default_value = ret[ 5 ];
     this->m_b_well_loaded = true;
     if( this->HasDefVal() )
     {

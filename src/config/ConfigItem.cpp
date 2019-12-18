@@ -1,7 +1,8 @@
 #include "ConfigItem.h"
 #include <fstream>
-#include "../UseRegex.h"
+#include <boost/regex.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <seadrip/KvFileReader.hpp>
 #include <seadrip/template.hpp>
 #include <seadrip/tpl/config.h>
 
@@ -9,14 +10,17 @@ using namespace SeaDrip::Binaland;
 
 bool MatchItem( std::string str, std::string& itemName, std::string& value )
 {
-    auto find = SeaDrip::regex_all( "([^=]+)=(.+)", str );
-    if( find.size() != 3 )
+    boost::regex pattern( "([^=]+)=(.+)" );
+    boost::smatch find;
+    if( !boost::regex_search( str, find, pattern ) || ( find.size() != 3 ) )
     {
         return false;
     }
 
-    itemName = find[ 1 ];
-    value = find[ 2 ];
+    std::string n = find[ 1 ];
+    itemName = boost::trim_copy( n );
+    std::string v = find[ 2 ];
+    value = boost::trim_copy( v );
     return true;
 }
 
@@ -46,14 +50,15 @@ int ConfigItem::ParseTpl()
     while( !in.eof() )
     {
         in.getline( line, 128 );
-        std::string sline = TrimStr( std::string( line ) );
+        std::string sline = line;
+        sline = boost::trim_copy( sline );
         if( sline.empty() || ( sline.c_str()[ 0 ] == '#' ) )
         {
             continue;
         }
         if( sline.c_str()[ 0 ] == '+' )
         {
-            ConfigPropertyTpl prop( sline );
+            ConfigPropertyTpl prop( line + 1 );
             if( !prop.IsValid() )
             {
                 continue;
@@ -78,7 +83,12 @@ int ConfigItem::ParseTpl()
         }
         if( this->m_arr_includes.empty() && ( key == "include" ) )
         {
-            this->m_arr_includes = SplitStr( ",", val );
+            boost::split( this->m_arr_includes, val, boost::is_any_of( "," ), boost::token_compress_on );
+            continue;
+        }
+        if( this->m_s_def_cfgfile.empty() && (key == "def-file") )
+        {
+            this->m_s_def_cfgfile = val;
         }
         if( ( key == "type" ) && ( val == "daemon" ) )
         {
@@ -129,7 +139,7 @@ int ConfigItem::SaveOutput()
         if( item.CanBeSetByShell() )
         {
             options += item.GetShellOption();
-            optioncases += ( TabSpace( 3 ) + item.GetShellOverrideCase() );
+            optioncases += ( "    " + item.GetShellOverrideCase() );
         }
         if( item.IsBoolProperty() )
         {
